@@ -19,7 +19,7 @@ from ._base import Masker, logger
 
 
 class Mask(Masker):
-    """ Perform transformation to align and get landmarks """
+    """ Neural network to process face image into a segmentation mask of the face """
     def __init__(self, **kwargs):
         git_model_id = 6
         model_filename = "DFL_256_sigmoid_v1.h5"
@@ -32,7 +32,11 @@ class Mask(Masker):
         self.batchsize = self.config["batch-size"]
 
     def init_model(self):
-        self.model = KSession(self.name, self.model_path, model_kwargs=dict())
+        self.model = KSession(self.name,
+                              self.model_path,
+                              model_kwargs=dict(),
+                              allow_growth=self.config["allow_growth"],
+                              exclude_gpus=self._exclude_gpus)
         self.model.load_model()
         placeholder = np.zeros((self.batchsize, self.input_size, self.input_size, 3),
                                dtype="float32")

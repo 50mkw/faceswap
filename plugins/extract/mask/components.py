@@ -32,8 +32,8 @@ class Mask(Masker):
         for mask, face in zip(batch["feed"], batch["detected_faces"]):
             parts = self.parse_parts(np.array(face.feed_landmarks))
             for item in parts:
-                item = np.concatenate(item)
-                hull = cv2.convexHull(item).astype("int32")  # pylint: disable=no-member
+                item = np.rint(np.concatenate(item)).astype("int32")
+                hull = cv2.convexHull(item)
                 cv2.fillConvexPoly(mask, hull, 1.0, lineType=cv2.LINE_AA)
         batch["prediction"] = batch["feed"]
         return batch
@@ -44,7 +44,7 @@ class Mask(Masker):
 
     @staticmethod
     def parse_parts(landmarks):
-        """ Component facehull mask """
+        """ Component face hull mask """
         r_jaw = (landmarks[0:9], landmarks[17:18])
         l_jaw = (landmarks[8:17], landmarks[26:27])
         r_cheek = (landmarks[17:20], landmarks[8:9])
